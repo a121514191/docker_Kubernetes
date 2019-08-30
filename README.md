@@ -8,6 +8,7 @@ Kubernetes命令行工具kubectl允許您對Kubernetes集群運行命令
 
 官網安裝: https://kubernetes.io/docs/tasks/tools/install-kubectl/#download-as-part-of-the-google-cloud-sdk
 
+## Step1. 在centos7上安裝kubectl
 我的系統為centos7 , 所以使用下列安裝方式
 
 ```
@@ -29,196 +30,100 @@ yum install -y kubectl
 kubectl version
 ```
 
-## Kubernetes 架構簡介
+![](https://github.com/a121514191/docker_Kubernetes/blob/master/hubectl%20version.PNG)
 
-Kubernetes cluster 主要可以分為 Master 和 Node 兩部份
+## Step2.下載為Google Cloud SDK的一部分
 
-Master 負責指揮調度 Node。在 Kubernetes 世界裡，Node 上的 Pod 是運行調度的最小單位
+參考網址: https://cloud.google.com/sdk/docs/quickstart-redhat-centos
 
-裡面可以放多個 container（一般以有緊密相關的服務為主，同一個 Pod 共享 IP），也可以只有單個 Container
+如果您還沒有 Google Cloud Platform 專案，請建立 Google Cloud Platform 專案
 
-同一個 Pod 的 container 是一起被調度。
+建立後如圖
 
-而 Deployment 為管理 Pod 的 Controller，我們可以視一組 Deployment 為一組應用服務。
+![](https://github.com/a121514191/docker_Kubernetes/blob/master/google%20cloud.PNG)
 
-而 Service 可以固定住我們對外服務的 IP，不會因為 Pod 關閉重啟而喪失原來的 IP 位置。
+# centos 安裝 Cloud SDK 
 
-## Minikube
-
-Minikube 這個可以在本地端跑 Kubernetes 工作，來在本地端部屬我們的 Kubernetes cluster
-
-感受一下 k8s 的應用。由於 minikube 只提供 signle-node Kubernetes Cluster
-
-本身並不支援 HA (High availability)，所以不推薦在實際應用上運行呦。
-
-## 安裝流程(Minikube)
-
-官方安裝(Linux、MacOS、Windows)
-
-本次實作，使用windows版，搭配docker-toolbox(因為不是window10-pro)
-
-安裝網址 https://kubernetes.io/docs/tasks/tools/install-minikube/
-
-裝完遇到錯誤
-
-1.與docker連接的 Oracle VM VirtualBox 介面卡出問題
-
-查詢到在安裝toolbox，有預設沒勾選，所以無法使用，於是重新安裝docker-toolbox(另一種方法，試了但失敗)
-
-錯誤訊息
-```
-Failed to open/create the internal network 'HostInterfaceNetworking-VirtualBox Host-Only Ethernet Adapter' (VERR_INTNET_FLT_IF_NOT_FOUND).
-Failed to attach the network LUN (VERR_INTNET_FLT_IF_NOT_FOUND).
-```
-
-預設沒勾
-
-![](https://github.com/a121514191/docker_minikube/blob/master/Reason11-300x232.png)
-
-參考網址:
-
-1. https://majing.io/questions/376
-
-2. https://blogs.msdn.microsoft.com/gaurav/2016/11/19/fix-failed-to-opencreate-the-internal-network-hostinterfacenetworking-virtualbox-host-only-ethernet-adapter-error-verr_intnet_flt_if_not_found-with-docker-quickstart-terminal/
-
-2.重裝後遇到問題(參考網址解決但失敗，於是用舊版本 <v18.09.0> 就搞定)
-
-錯誤訊息
+*Update YUM with Cloud SDK repo information: 
 
 ```
-This computer doesn’t have VT-X/AMD-v enabled. Enabling it in the BIOS is mandatory.
+sudo tee -a /etc/yum.repos.d/google-cloud-sdk.repo << EOM
+[google-cloud-sdk]
+name=Google Cloud SDK
+baseurl=https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+       https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOM
 ```
 
-參考網址:
-1. https://localbyflywheel.com/community/t/windows-help-im-getting-a-bios-error-about-vt-x-amd-v-during-installation/426
-
-## 安裝完畢後-首先依照官網範例實作
-
-啟動
+*The indentation for the 2nd line of gpgkey is important.
+*Install the Cloud SDK
 
 ```
-minikube start 啟動minikube
-
-kubectl run hello-minikube --image=k8s.gcr.io/echoserver:1.10 --port=8080 官網測試用images
-
-kubectl expose deployment hello-minikube --type=NodePort  指定服務的類型
-
-kubectl get pod 檢查Pod是否已啟動並運行
-
-minikube service hello-minikube --url 獲取公開的服務的URL
+sudo yum install google-cloud-sdk
 ```
-
-獲取網址
-
-![](https://github.com/a121514191/docker_minikube/blob/master/uri.PNG)
-
-成果圖
-
-![](https://github.com/a121514191/docker_minikube/blob/master/result.PNG)
-
-額外指令
+# 完成後 初始化 SDK
 
 ```
-kubectl delete services hello-minikube 刪除服務
-
-kubectl delete deployment hello-minikube 刪除部屬
-
-minikube stop 停止minihube
-
-minikube delete 刪除minikube
+gcloud init
 ```
 
-## 圖形化介面
+# 初始化完成後會要求你登入 使用 Google 使用者帳戶並接受登入選項：
+
+To continue, you must log in. Would you like to log in (Y/n)? Y
+
+![](https://github.com/a121514191/docker_Kubernetes/blob/master/google-login.PNG)
+
+擷取字串貼至瀏覽器，會要求你登入google，登入完成後會給你驗證碼
+
+![](https://github.com/a121514191/docker_Kubernetes/blob/master/password.PNG)
+
+成功進入後 可以看到你在 google cloud platform 所建立的專案
+
+![](https://github.com/a121514191/docker_Kubernetes/blob/master/project.PNG)
+
+選取你有的專案或是新增一個，成功執行後如下圖(我選擇已建立好的)
+
+![](https://github.com/a121514191/docker_Kubernetes/blob/master/cloud%20finish.PNG)
+
+# 執行核心 gcloud 指令
+
+列出本機系統上已儲存憑證的帳戶
 
 ```
-minikube dashboard 
-```
-![](https://github.com/a121514191/docker_minikube/blob/master/dashboard.PNG)
-
-# 簡單範例
-
-部屬一個簡單範例應用到 Kubernetes
-
-kubectl run 可以讓我們啟動我們的 Pod
-
-–image 後面接的是 docker image 位置和版本
-
-–port 則是 container 對外的 port
-
-```
-kubectl run docker-python-flask-demo --image=docker.io/kdchang/docker-python-flask-demo:v1 --port 3000 
-
-kubectl expose deployment/docker-python-flask-demo --type="NodePort" --port 3000 指定服務的類型(讓外部可以訪問)
-
-kubectl get services 取得所有服務
-
-minikube service docker-python-flask-demo --url 取得url
+gcloud auth list
 ```
 
-獲取網址
+![](https://github.com/a121514191/docker_Kubernetes/blob/master/list.PNG)
 
-![](https://github.com/a121514191/docker_minikube/blob/master/python-url.PNG)
-
-成果圖
-
-![](https://github.com/a121514191/docker_minikube/blob/master/python-result.PNG)
-
-## 擴充應用
-
-透過以下指令查看副本數
+列出您所使用 SDK 配置中的屬性：
 
 ```
-kubectl get deployments
-```
-![](https://github.com/a121514191/docker_minikube/blob/master/deployments.PNG)
-
-設定副本數量為 2：
-
-```
-kubectl scale deployments/docker-python-flask-demo --replicas=2
+gcloud config list
 ```
 
-我們可以看到原本的副本數量從 1 變成了 2：
+![](https://github.com/a121514191/docker_Kubernetes/blob/master/config.PNG)
 
-![](https://github.com/a121514191/docker_minikube/blob/master/deployments-2.PNG)
+其餘指令可參考網址: https://cloud.google.com/sdk/docs/quickstart-redhat-centos
 
-## 更新應用
-
-若是我們想要更新 container 的版本的話可以下以下指令
-
-也就是說原本 docker image tag v1 版本改進到 v2 版本
-
-我們可以透過更新 docker image 來進行進版
+# gcloud運行kubectl安裝命令
 
 ```
-kubectl set image deployments/docker-python-flask-demo docker-python-flask-demo=docker.io/kdchang/docker-python-flask-demo:v2
+gcloud components install kubectl
 ```
 
-瀏覽器重新整理
+出錯
 
-![](https://github.com/a121514191/docker_minikube/blob/master/python-result2.PNG)
+![](https://github.com/a121514191/docker_Kubernetes/blob/master/error.PNG)
 
-若要回到 v1 版本可以透過 rollout undo 指令來進行：
+您無法執行此操作，因為Cloud SDK組件管理器，已禁用此安裝
 
-```
-kubectl rollout undo deployments/docker-python-flask-demo
-```
-![](https://github.com/a121514191/docker_minikube/blob/master/python-result.PNG)
+## 跳過錯誤，
 
-總結:
 
-以上簡單透過 minikube 介紹 Kubernetes 的架構和部屬 cluster 和應用在本地端
 
-實際上我們可以透過雲端服務來部屬我們的 Kubernetes 應用
-
-minikube 主要是用在練習和教學使用，不建議使用在生產環境上
-
-參考網址:
-
-1. https://blog.techbridge.cc/2018/12/01/kubernetes101-introduction-tutorial/
-
-2. https://ithelp.ithome.com.tw/articles/10193232
-
-3. https://ithelp.ithome.com.tw/articles/10193232
 
 
