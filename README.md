@@ -121,7 +121,69 @@ gcloud components install kubectl
 
 您無法執行此操作，因為Cloud SDK組件管理器，已禁用此安裝
 
-## 跳過錯誤，
+## Step3. 跳過錯誤，先驗證kubectl配置
+
+通過獲取群集狀態檢查kubectl是否已正確配置：
+
+```
+kubectl cluster-info
+```
+
+如果您看到URL響應，則kubectl已正確配置為訪問您的群集。
+
+如果您看到類似於以下內容的消息，則kubectl配置不正確或無法連接到Kubernetes群集。
+
+```
+The connection to the server <server-name:port> was refused - did you specify the right host or port?
+```
+
+![](https://github.com/a121514191/docker_Kubernetes/blob/master/error2.PNG)
+
+如果是使用Minikube 可用以下語法檢查配置
+
+```
+kubectl cluster-info dump
+```
+
+## Step4. kubectl配置
+
+啟用shell自動完成功能
+
+```
+kubectl completion bash
+```
+
+完成腳本依賴於bash-completion
+
+可以測試是否已通過運行安裝了bash-completion -> type _init_completion
+
+安裝bash-completion
+
+```
+apt-get install bash-completion
+
+yum install bash-completion
+```
+
+上面的命令創建/usr/share/bash-completion/bash_completion
+重新加載shell並通過鍵入驗證是否正確安裝了bash-completion
+
+```
+source /usr/share/bash-completion/bash_completion
+
+type _init_completion
+```
+
+參考網址:
+*google-cloud
+1. https://cloud.google.com/sdk/docs/quickstart-redhat-centos
+*kubernetes
+2. https://kubernetes.io/docs/tasks/tools/install-kubectl/
+
+
+
+
+
 
 
 
